@@ -7,7 +7,10 @@ import type { Request, Response } from 'express';
 let redisClient: ReturnType<typeof createClient> | null = null;
 
 async function initRedis() {
-  if (!config.redisUrl) return null;
+  if (!config.redisUrl) {
+    console.log('Redis URL not configured, using in-memory rate limiting');
+    return null;
+  }
 
   try {
     const client = createClient({ url: config.redisUrl });
@@ -16,7 +19,7 @@ async function initRedis() {
     console.log('Redis connected for rate limiting');
     return client;
   } catch (error) {
-    console.warn('Failed to connect to Redis, using in-memory rate limiting:', error);
+    console.warn('Failed to connect to Redis, falling back to in-memory rate limiting:', error);
     return null;
   }
 }
@@ -38,12 +41,16 @@ export async function setupRateLimiters() {
     };
 
     if (redis) {
-      options.store = new RedisStore({
-        sendCommand: async (command: string[]) => {
-          return redis.sendCommand(command);
-        },
-        prefix: 'rl:',
-      });
+      try {
+        options.store = new RedisStore({
+          sendCommand: async (...args: string[]) => {
+            return redis.sendCommand(args);
+          },
+          prefix: 'rl:',
+        });
+      } catch (error) {
+        console.warn('Failed to create Redis store for rate limiting, using in-memory fallback:', error);
+      }
     }
 
     return rateLimit(options);

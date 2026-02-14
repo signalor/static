@@ -44,7 +44,33 @@ export function setupProxyRoutes(app: Express) {
 
       // Stream the file
       if (s3Object.Body) {
-        s3Object.Body.pipe(res);
+        // Handle AWS SDK v3 stream response
+        const body = s3Object.Body as any;
+        if (typeof body.pipe === 'function') {
+          body.pipe(res);
+        } else if (typeof body.transformToWebStream === 'function') {
+          // Handle Blob/WebStream response
+          const webStream = body.transformToWebStream();
+          res.setHeader('Content-Type', contentType);
+          webStream.pipeTo(res as any);
+        } else if (body[Symbol.asyncIterator]) {
+          // Handle async iterable response
+          (async () => {
+            try {
+              for await (const chunk of body) {
+                res.write(chunk);
+              }
+              res.end();
+            } catch (error) {
+              res.destroy();
+            }
+          })();
+        } else {
+          res.status(500).json({
+            success: false,
+            error: 'Unable to stream file',
+          });
+        }
       } else {
         res.status(404).json({
           success: false,

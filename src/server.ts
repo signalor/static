@@ -63,9 +63,9 @@ async function startServer() {
 
     // Start server
     app.listen(config.port, () => {
-      console.log(`\n🚀 File server running on http://localhost:${config.port}`);
-      console.log(`📁 Buckets: ${config.bucketNames.join(', ')}`);
-      console.log(`🔗 File URL: http://localhost:${config.port}/bucketname/path/to/file.ext\n`);
+      console.log(`\nFile server running on http://localhost:${config.port}`);
+      console.log(`Buckets: ${config.bucketNames.join(', ')}`);
+      console.log(`File URL: http://localhost:${config.port}/bucketname/path/to/file.ext\n`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);

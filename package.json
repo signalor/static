@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "bun run src/server.ts",
-    "start": "bun run src/server.js",
+    "build": "bun run --bun tsc",
+    "start": "bun dist/server.js",
     "type-check": "bun run --bun tsc --noEmit"
   },
   "keywords": [
@@ -37,6 +38,7 @@
     "@types/node": "^20.10.6",
     "@types/mime-types": "^2.1.2",
     "@types/multer": "^1.4.7",
-    "@types/cookie-parser": "^1.4.4"
+    "@types/cookie-parser": "^1.4.4",
+    "@types/cors": "^2.8.17"
   }
 }
