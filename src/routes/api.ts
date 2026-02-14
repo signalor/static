@@ -84,7 +84,7 @@ export function setupApiRoutes(app: Express, authLimiter: any, apiLimiter: any) 
         const result = await s3Service.listObjects(
           bucketName,
           String(prefix),
-          String(continuationToken)
+          continuationToken ? String(continuationToken) : undefined
         );
 
         res.json({
