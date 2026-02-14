@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Signalor Static File Manager</title>
     <style>
-      /* -- Signalor Design Tokens -- */
+      /* -- Signalor Design Tokens (Dark Mode) -- */
       :root {
         --color-primary: #E09D70;
         --color-secondary-coral: #E08970;
@@ -16,12 +16,12 @@
         --color-success: #70E09D;
         --color-error: #E07670;
         --color-info: #70A0E0;
-        --bg-primary: #FFFFFF;
-        --bg-secondary: #FAFAFA;
-        --bg-tertiary: #F5F5F5;
-        --text-primary: #1A1A1A;
-        --text-secondary: #666666;
-        --border-color: #E0E0E0;
+        --bg-primary: #1A1A1A;
+        --bg-secondary: #242424;
+        --bg-tertiary: #2E2E2E;
+        --text-primary: #FAFAFA;
+        --text-secondary: #A0A0A0;
+        --border-color: #404040;
       }
 
       * {
@@ -121,7 +121,7 @@
       }
 
       .error {
-        background: #FFF5F5;
+        background: rgba(224, 118, 112, 0.1);
         color: var(--color-error);
         padding: 0.75rem;
         border-radius: 2px;
@@ -130,8 +130,8 @@
       }
 
       .success {
-        background: #F0FFF5;
-        color: #2D8A4E;
+        background: rgba(112, 224, 157, 0.1);
+        color: var(--color-success);
         padding: 0.75rem;
         border-radius: 2px;
         margin-bottom: 1rem;
@@ -279,13 +279,13 @@
       }
 
       .file-actions button.delete {
-        background: #FFF5F5;
+        background: rgba(224, 118, 112, 0.1);
         color: var(--color-error);
         border-color: var(--color-error);
       }
 
       .file-actions button.delete:hover {
-        background: #FFECEC;
+        background: rgba(224, 118, 112, 0.2);
       }
 
       .modal {
@@ -294,7 +294,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.7);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -477,7 +477,7 @@
 
           <button type="submit">Login</button>
 
-          <p style="text-align: center; margin-top: 1rem; color: #999; font-size: 0.85rem">
+          <p style="text-align: center; margin-top: 1rem; color: var(--text-secondary); font-size: 0.85rem">
             Enter the access password to manage files
           </p>
         </form>
