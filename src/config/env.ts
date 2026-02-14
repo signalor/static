@@ -69,14 +69,14 @@ function validateEnv(): Config {
   }
 
   return {
-    accessKeyId: process.env.ACCESS_KEY_ID!,
-    secretAccessKey: process.env.SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.ACCESS_KEY_ID!.trim(),
+    secretAccessKey: process.env.SECRET_ACCESS_KEY!.trim(),
     bucketNames,
     friendlyBucketNames: friendlyNames.length > 0 ? friendlyNames : undefined,
     bucketNameMap,
     actualBucketMap,
-    endpoint: process.env.ENDPOINT!,
-    region: process.env.REGION || 'us-east-1',
+    endpoint: process.env.ENDPOINT!.trim().replace(/\/+$/, ''),
+    region: (process.env.REGION || 'us-east-1').trim(),
     privateToken: process.env.PRIVATE_TOKEN!,
     port: parseInt(process.env.PORT || '3000', 10),
     nodeEnv: (process.env.NODE_ENV as any) || 'development',
