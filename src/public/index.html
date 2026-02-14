@@ -5,6 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Signalor Static File Manager</title>
     <style>
+      /* -- Signalor Design Tokens -- */
+      :root {
+        --color-primary: #E09D70;
+        --color-secondary-coral: #E08970;
+        --color-secondary-amber: #E09228;
+        --color-accent-salmon: #E07670;
+        --color-accent-gold: #E0BF70;
+        --color-neutral: #E0CABB;
+        --color-success: #70E09D;
+        --color-error: #E07670;
+        --color-info: #70A0E0;
+        --bg-primary: #FFFFFF;
+        --bg-secondary: #FAFAFA;
+        --bg-tertiary: #F5F5F5;
+        --text-primary: #1A1A1A;
+        --text-secondary: #666666;
+        --border-color: #E0E0E0;
+      }
+
       * {
         margin: 0;
         padding: 0;
@@ -14,12 +33,13 @@
       body {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
           Arial, sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: var(--bg-tertiary);
         min-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 1rem;
+        color: var(--text-primary);
       }
 
       .app {
@@ -29,9 +49,9 @@
 
       .login-container,
       .manager-container {
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        background: var(--bg-primary);
+        border: 2px solid var(--border-color);
+        border-radius: 2px;
         padding: 2rem;
       }
 
@@ -43,7 +63,7 @@
       .login-form h1 {
         font-size: 2rem;
         margin-bottom: 1rem;
-        color: #333;
+        color: var(--text-primary);
         text-align: center;
       }
 
@@ -55,7 +75,7 @@
         display: block;
         margin-bottom: 0.5rem;
         font-weight: 500;
-        color: #555;
+        color: var(--text-secondary);
       }
 
       input[type='password'],
@@ -63,26 +83,28 @@
       select {
         width: 100%;
         padding: 0.75rem;
-        border: 2px solid #e0e0e0;
-        border-radius: 4px;
+        border: 2px solid var(--border-color);
+        border-radius: 2px;
         font-size: 1rem;
         transition: border-color 0.2s;
+        background: var(--bg-primary);
+        color: var(--text-primary);
       }
 
       input[type='password']:focus,
       input[type='text']:focus,
       select:focus {
         outline: none;
-        border-color: #667eea;
+        border-color: var(--color-primary);
       }
 
       button {
         width: 100%;
         padding: 0.75rem;
-        background: #667eea;
+        background: var(--color-primary);
         color: white;
-        border: none;
-        border-radius: 4px;
+        border: 2px solid var(--color-primary);
+        border-radius: 2px;
         font-size: 1rem;
         font-weight: 600;
         cursor: pointer;
@@ -90,7 +112,8 @@
       }
 
       button:hover {
-        background-color: #5568d3;
+        background-color: var(--color-secondary-coral);
+        border-color: var(--color-secondary-coral);
       }
 
       button:active {
@@ -98,21 +121,21 @@
       }
 
       .error {
-        background: #fee;
-        color: #c33;
+        background: #FFF5F5;
+        color: var(--color-error);
         padding: 0.75rem;
-        border-radius: 4px;
+        border-radius: 2px;
         margin-bottom: 1rem;
-        border-left: 4px solid #c33;
+        border-left: 4px solid var(--color-error);
       }
 
       .success {
-        background: #efe;
-        color: #3c3;
+        background: #F0FFF5;
+        color: #2D8A4E;
         padding: 0.75rem;
-        border-radius: 4px;
+        border-radius: 2px;
         margin-bottom: 1rem;
-        border-left: 4px solid #3c3;
+        border-left: 4px solid var(--color-success);
       }
 
       .hidden {
@@ -126,28 +149,32 @@
         align-items: center;
         margin-bottom: 2rem;
         padding-bottom: 1rem;
-        border-bottom: 2px solid #f0f0f0;
+        border-bottom: 2px solid var(--border-color);
       }
 
       .header h1 {
         font-size: 1.5rem;
-        color: #333;
+        color: var(--text-primary);
       }
 
       .logout-btn {
         width: auto;
         padding: 0.5rem 1rem;
-        background: #999;
+        background: transparent;
+        color: var(--text-secondary);
+        border: 2px solid var(--border-color);
         font-size: 0.9rem;
       }
 
       .logout-btn:hover {
-        background-color: #777;
+        background-color: var(--bg-tertiary);
+        border-color: var(--text-secondary);
+        color: var(--text-primary);
       }
 
       .controls {
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: 1rem;
         margin-bottom: 2rem;
       }
@@ -163,24 +190,28 @@
         gap: 0.5rem;
         margin-bottom: 1rem;
         font-size: 0.9rem;
-        color: #666;
+        color: var(--text-secondary);
         flex-wrap: wrap;
+        align-items: center;
       }
 
       .breadcrumb button {
         width: auto;
         padding: 0.25rem 0.75rem;
-        background: #f0f0f0;
-        color: #667eea;
+        background: var(--bg-tertiary);
+        color: var(--color-primary);
+        border: 1px solid var(--border-color);
         font-size: 0.85rem;
       }
 
       .breadcrumb button:hover {
-        background: #e0e0e0;
+        background: var(--bg-secondary);
+        border-color: var(--color-primary);
       }
 
       .breadcrumb span {
-        color: #999;
+        color: var(--text-secondary);
+        line-height: 1;
       }
 
       .file-grid {
@@ -191,28 +222,30 @@
       }
 
       .file-card {
-        background: #fafafa;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
+        background: var(--bg-primary);
+        border: 2px solid var(--border-color);
+        border-radius: 2px;
         padding: 1rem;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: border-color 0.2s;
       }
 
       .file-card:hover {
-        border-color: #667eea;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
-        transform: translateY(-2px);
+        border-color: var(--color-primary);
       }
 
       .file-icon {
-        font-size: 2.5rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        font-family: monospace;
         margin-bottom: 0.5rem;
+        color: var(--color-primary);
+        letter-spacing: 0.5px;
       }
 
       .file-name {
         font-weight: 600;
-        color: #333;
+        color: var(--text-primary);
         margin-bottom: 0.5rem;
         word-break: break-word;
         overflow: hidden;
@@ -222,7 +255,7 @@
 
       .file-meta {
         font-size: 0.8rem;
-        color: #999;
+        color: var(--text-secondary);
         margin-bottom: 0.75rem;
       }
 
@@ -235,21 +268,24 @@
         flex: 1;
         padding: 0.5rem;
         font-size: 0.8rem;
-        background: #e0e0e0;
-        color: #333;
+        background: var(--bg-tertiary);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
       }
 
       .file-actions button:hover {
-        background: #d0d0d0;
+        background: var(--bg-secondary);
+        border-color: var(--color-primary);
       }
 
       .file-actions button.delete {
-        background: #ffdbdb;
-        color: #c33;
+        background: #FFF5F5;
+        color: var(--color-error);
+        border-color: var(--color-error);
       }
 
       .file-actions button.delete:hover {
-        background: #ffcccc;
+        background: #FFECEC;
       }
 
       .modal {
@@ -266,8 +302,9 @@
       }
 
       .modal-content {
-        background: white;
-        border-radius: 8px;
+        background: var(--bg-primary);
+        border: 2px solid var(--border-color);
+        border-radius: 2px;
         padding: 2rem;
         max-width: 500px;
         width: 100%;
@@ -279,7 +316,7 @@
         font-size: 1.25rem;
         font-weight: 600;
         margin-bottom: 1.5rem;
-        color: #333;
+        color: var(--text-primary);
       }
 
       .modal-footer {
@@ -293,37 +330,40 @@
       }
 
       .modal-footer button.cancel {
-        background: #e0e0e0;
-        color: #333;
+        background: transparent;
+        color: var(--text-secondary);
+        border: 2px solid var(--border-color);
       }
 
       .modal-footer button.cancel:hover {
-        background: #d0d0d0;
+        background: var(--bg-tertiary);
+        border-color: var(--text-secondary);
+        color: var(--text-primary);
       }
 
       .upload-area {
-        border: 2px dashed #667eea;
-        border-radius: 8px;
+        border: 2px dashed var(--color-primary);
+        border-radius: 2px;
         padding: 2rem;
         text-align: center;
         cursor: pointer;
         transition: all 0.2s;
-        background: #f9f9f9;
+        background: var(--bg-secondary);
       }
 
       .upload-area:hover,
       .upload-area.drag-over {
-        background: #f0f0ff;
-        border-color: #5568d3;
+        background: var(--bg-tertiary);
+        border-color: var(--color-secondary-coral);
       }
 
       .upload-area p {
-        color: #666;
+        color: var(--text-secondary);
         margin-bottom: 0.5rem;
       }
 
       .upload-area small {
-        color: #999;
+        color: var(--text-secondary);
       }
 
       .loading {
@@ -335,8 +375,8 @@
         display: inline-block;
         width: 20px;
         height: 20px;
-        border: 3px solid #f3f3f3;
-        border-top: 3px solid #667eea;
+        border: 3px solid var(--border-color);
+        border-top: 3px solid var(--color-primary);
         border-radius: 50%;
         animation: spin 1s linear infinite;
         margin-right: 0.5rem;
@@ -355,12 +395,15 @@
       .empty-state {
         text-align: center;
         padding: 3rem 1rem;
-        color: #999;
+        color: var(--text-secondary);
       }
 
       .empty-state-icon {
-        font-size: 3rem;
+        font-size: 1rem;
+        font-family: monospace;
+        font-weight: 700;
         margin-bottom: 1rem;
+        color: var(--color-neutral);
       }
 
       .stats {
@@ -368,8 +411,9 @@
         gap: 2rem;
         margin-bottom: 2rem;
         padding: 1rem;
-        background: #f9f9f9;
-        border-radius: 8px;
+        background: var(--bg-secondary);
+        border: 2px solid var(--border-color);
+        border-radius: 2px;
       }
 
       .stat {
@@ -378,15 +422,16 @@
 
       .stat-label {
         font-size: 0.85rem;
-        color: #999;
+        color: var(--text-secondary);
         text-transform: uppercase;
         margin-bottom: 0.25rem;
+        letter-spacing: 0.5px;
       }
 
       .stat-value {
         font-size: 1.5rem;
         font-weight: 600;
-        color: #667eea;
+        color: var(--color-primary);
       }
 
       input[type='file'] {
@@ -697,7 +742,7 @@
           const card = document.createElement('div');
           card.className = 'file-card';
 
-          const icon = isFolder ? '📁' : getFileIcon(fileName);
+          const icon = isFolder ? '[DIR]' : getFileIcon(fileName);
           const size = isFolder ? '-' : formatBytes(file.size);
 
           card.innerHTML = `
