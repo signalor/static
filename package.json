@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "bun run src/server.ts",
     "build": "bun run --bun tsc",
-    "start": "bun src/server.js",
+    "start": "bun dist/server.js",
     "type-check": "bun run --bun tsc --noEmit"
   },
   "keywords": [

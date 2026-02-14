@@ -12,6 +12,9 @@ RUN bun install --production
 COPY src ./src
 COPY tsconfig.json ./
 
+# Build TypeScript
+RUN bun run build
+
 # Expose port
 EXPOSE 3000
 
