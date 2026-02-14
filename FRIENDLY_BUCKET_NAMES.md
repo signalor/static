@@ -157,11 +157,11 @@ Error: FRIENDLY_BUCKET_NAMES count (2) must match BUCKET_NAMES count (3)
 **Solution**: Make sure both arrays have the same number of items.
 
 ```env
-# ✅ Correct
+# Correct
 BUCKET_NAMES=bucket1,bucket2,bucket3
 FRIENDLY_BUCKET_NAMES=name1,name2,name3
 
-# ❌ Wrong
+# Wrong
 BUCKET_NAMES=bucket1,bucket2,bucket3
 FRIENDLY_BUCKET_NAMES=name1,name2
 ```
@@ -263,9 +263,9 @@ API also accepts: `/bucket-prod/...`, `/bucket-staging/...`, `/bucket-cdn/...`
 2. Restart server
 
 3. Old URLs still work temporarily:
-   - `/documents/file.pdf` → ❌ Doesn't resolve (removed mapping)
-   - `/files/file.pdf` → ✅ Works (new mapping)
-   - `/my-bucket-1/file.pdf` → ✅ Still works (actual name)
+   - `/documents/file.pdf` → Doesn't resolve (removed mapping)
+   - `/files/file.pdf` → Works (new mapping)
+   - `/my-bucket-1/file.pdf` → Still works (actual name)
 
 ### Removing Friendly Names
 
@@ -278,9 +278,9 @@ API also accepts: `/bucket-prod/...`, `/bucket-staging/...`, `/bucket-cdn/...`
 ### Naming
 
 Use:
-- ✅ Simple lowercase names: `documents`, `media`, `backups`
-- ✅ Hyphens for multi-word: `user-profiles`, `log-files`
-- ❌ Avoid spaces or special chars: `my documents`, `files@2024`
+- Simple lowercase names: `documents`, `media`, `backups`
+- Hyphens for multi-word: `user-profiles`, `log-files`
+- Avoid spaces or special chars: `my documents`, `files@2024`
 
 ### Pattern 1: Purpose-Based
 ```env

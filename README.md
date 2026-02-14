@@ -4,23 +4,33 @@ A comprehensive S3-compatible bucket file server with web GUI, password authenti
 
 ## Features
 
-- **Password-protected GUI** with 1-hour session TTL
-- **Rate limiting** (10 requests per 30 minutes for auth, configurable)
-- **Full file management** - upload, download, delete, move, rename files
-- **Folder navigation** with breadcrumb UI
-- **Public file proxy** at `/bucketname/path/to/file.ext`
-- **Friendly bucket names** - map ugly bucket names to pretty URLs
-- **Multi-bucket support** with separate namespace
-- **Modern responsive web GUI**
-- **File statistics** (count, total size, current path)
-- **Redis support** for distributed rate limiting
-- **S3-compatible** (AWS S3, MinIO, DigitalOcean Spaces, etc.)
+- Password-protected GUI with 1-hour session TTL
+- Rate limiting (10 requests per 30 minutes for auth, configurable)
+- Full file management - upload, download, delete, move, rename files
+- Folder navigation with breadcrumb UI
+- Public file proxy at `/bucketname/path/to/file.ext`
+- Friendly bucket names - map ugly bucket names to pretty URLs
+- Multi-bucket support with separate namespace
+- Modern responsive web GUI
+- File statistics (count, total size, current path)
+- Redis support for distributed rate limiting
+- S3-compatible (AWS S3, MinIO, DigitalOcean Spaces, etc.)
 
 ## Installation
 
+### Prerequisites
+
+- **Bun** (recommended) - Fast JavaScript runtime
+  ```bash
+  curl -fsSL https://bun.sh/install | bash
+  ```
+- Or Node.js 18+
+
+### Setup
+
 ```bash
 cd static
-npm install
+bun install
 ```
 
 ## Configuration
@@ -75,15 +85,23 @@ REDIS_URL=redis://localhost:6379
 ### Development
 
 ```bash
-npm run dev
+bun run dev
 ```
+
+The server starts instantly with Bun's fast TypeScript compilation and native TypeScript support.
 
 ### Production
 
 ```bash
-npm run build
-npm start
+bun run build
+bun start
 ```
+
+Bun provides:
+- 3x faster startup than Node.js
+- Smaller Docker images (~150MB vs 900MB+ with Node)
+- Native TypeScript support (no transpilation overhead)
+- Better performance for production workloads
 
 ## Usage
 

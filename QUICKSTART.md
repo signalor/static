@@ -1,5 +1,19 @@
 # Quick Start Guide
 
+## Prerequisites
+
+This project uses **Bun** for faster development and deployment:
+
+```bash
+# Install Bun (if not already installed)
+curl -fsSL https://bun.sh/install | bash
+
+# Verify installation
+bun --version
+```
+
+Bun is a fast JavaScript runtime that's compatible with Node.js. Learn more at [bun.sh](https://bun.sh)
+
 ## Setup in 5 minutes
 
 ### 1. Configure Environment
@@ -27,13 +41,13 @@ PORT=3000
 ### 2. Install Dependencies
 
 ```bash
-npm install
+bun install
 ```
 
 ### 3. Start Development Server
 
 ```bash
-npm run dev
+bun run dev
 ```
 
 Server starts at `http://localhost:3000`
@@ -151,14 +165,14 @@ PRIVATE_TOKEN=your_password
 
 ## Key Features
 
-- 🔐 Password-protected GUI (1-hour session)
-- ⚡ Rate limited (10 auth attempts per 30 minutes)
-- 📁 Full file management (upload, delete, move, rename)
-- 📂 Folder navigation
-- 🔗 Public file proxy (no auth needed)
-- 🪣 Multi-bucket support
-- 📊 File statistics
-- 🎨 Modern responsive UI
+- Password-protected GUI (1-hour session)
+- Rate limited (10 auth attempts per 30 minutes)
+- Full file management (upload, delete, move, rename)
+- Folder navigation
+- Public file proxy (no auth needed)
+- Multi-bucket support
+- File statistics
+- Modern responsive UI
 
 ## File Structure
 
@@ -200,7 +214,7 @@ static/
 
 **Port already in use?**
 ```bash
-npm run dev -- --port 3001
+PORT=3001 bun run dev
 ```
 
 **Can't connect to S3?**
