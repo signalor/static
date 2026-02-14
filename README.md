@@ -9,6 +9,7 @@ A comprehensive S3-compatible bucket file server with web GUI, password authenti
 - **Full file management** - upload, download, delete, move, rename files
 - **Folder navigation** with breadcrumb UI
 - **Public file proxy** at `/bucketname/path/to/file.ext`
+- **Friendly bucket names** - map ugly bucket names to pretty URLs
 - **Multi-bucket support** with separate namespace
 - **Modern responsive web GUI**
 - **File statistics** (count, total size, current path)
@@ -30,7 +31,8 @@ Create a `.env` file in the `static` directory:
 # S3-Compatible Bucket Configuration
 ACCESS_KEY_ID=your_access_key_id
 SECRET_ACCESS_KEY=your_secret_access_key
-BUCKET_NAMES=bucket1,bucket2,bucket3
+BUCKET_NAMES=bucket-23wedf,tbdas54,documents-234rfed
+FRIENDLY_BUCKET_NAMES=documents,media,profiles
 ENDPOINT=https://s3-endpoint.example.com
 REGION=us-east-1
 
@@ -54,6 +56,11 @@ REDIS_URL=redis://localhost:6379
 - **ACCESS_KEY_ID** (required): S3 access key
 - **SECRET_ACCESS_KEY** (required): S3 secret access key
 - **BUCKET_NAMES** (required): Comma-separated bucket names (e.g., `bucket1,bucket2,bucket3`)
+- **FRIENDLY_BUCKET_NAMES** (optional): Comma-separated friendly names for buckets (must match count of BUCKET_NAMES)
+  - Maps actual bucket names to user-friendly slugs
+  - E.g., `BUCKET_NAMES=bucket-23wedf,tbdas54,documents-234rfed` → `FRIENDLY_BUCKET_NAMES=documents,media,profiles`
+  - Access via `/documents/file.ext` instead of `/bucket-23wedf/file.ext`
+  - If not provided, actual bucket names are used in URLs
 - **ENDPOINT** (required): S3 endpoint URL
 - **REGION** (optional): AWS region, defaults to `us-east-1`
 - **PRIVATE_TOKEN** (required): Password to access the GUI
@@ -89,13 +96,33 @@ npm start
 
 ### File Proxy
 
-Access files directly via HTTP:
+Access files directly via HTTP using either actual or friendly bucket names:
 
 ```
-http://localhost:3000/bucketname/path/to/file.ext
+# Using friendly name (if configured)
+http://localhost:3000/documents/path/to/file.ext
+
+# Using actual bucket name
+http://localhost:3000/bucket-23wedf/path/to/file.ext
 ```
 
 Files served via the proxy are cached for 1 year. No authentication required.
+
+#### Friendly Bucket Names
+
+Configure `FRIENDLY_BUCKET_NAMES` to use pretty URLs:
+
+```env
+BUCKET_NAMES=bucket-23wedf,tbdas54,documents-234rfed
+FRIENDLY_BUCKET_NAMES=documents,media,profiles
+```
+
+Then access files as:
+- `http://localhost:3000/documents/file.pdf` instead of `http://localhost:3000/bucket-23wedf/file.pdf`
+- `http://localhost:3000/media/image.jpg` instead of `http://localhost:3000/tbdas54/image.jpg`
+- `http://localhost:3000/profiles/avatar.png` instead of `http://localhost:3000/documents-234rfed/avatar.png`
+
+Both friendly and actual names work in all API endpoints.
 
 ### API Endpoints
 

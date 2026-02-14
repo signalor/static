@@ -646,8 +646,11 @@
           bucketSelect.innerHTML = '<option value="">Select a bucket...</option>';
           data.buckets.forEach(bucket => {
             const option = document.createElement('option');
-            option.value = bucket;
-            option.textContent = bucket;
+            // Use friendly name as value if available, otherwise use actual name
+            const bucketValue = typeof bucket === 'object' ? bucket.friendly || bucket.actual : bucket;
+            const bucketDisplay = typeof bucket === 'object' ? bucket.friendly || bucket.actual : bucket;
+            option.value = bucketValue;
+            option.textContent = bucketDisplay;
             bucketSelect.appendChild(option);
           });
         } catch (error) {

@@ -4,8 +4,8 @@ import mime from 'mime-types';
 
 export function setupProxyRoutes(app: Express) {
   /**
-   * Proxy route: GET /bucketname/path/to/file.ext
-   * Serves files directly from S3 bucket
+   * Proxy route: GET /bucketname/path/to/file.ext or GET /friendly-name/path/to/file.ext
+   * Serves files directly from S3 bucket (accepts both friendly and actual bucket names)
    */
   app.get('/:bucketName/*', async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -19,7 +19,7 @@ export function setupProxyRoutes(app: Express) {
         });
       }
 
-      // Validate bucket
+      // Validate bucket (accepts friendly or actual name)
       if (!s3Service.validateBucket(bucketName)) {
         return res.status(404).json({
           success: false,

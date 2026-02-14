@@ -15,11 +15,14 @@ Edit `.env` with your S3 credentials:
 ```env
 ACCESS_KEY_ID=your_key
 SECRET_ACCESS_KEY=your_secret
-BUCKET_NAMES=bucket1,bucket2
+BUCKET_NAMES=bucket-23wedf,tbdas54,documents-234rfed
+FRIENDLY_BUCKET_NAMES=documents,media,profiles
 ENDPOINT=https://s3-endpoint.com
 PRIVATE_TOKEN=your_secure_password
 PORT=3000
 ```
+
+**Note:** `FRIENDLY_BUCKET_NAMES` is optional. Use it to map long bucket names to pretty URLs.
 
 ### 2. Install Dependencies
 
@@ -46,17 +49,33 @@ Server starts at `http://localhost:3000`
 
 ### Access Files Publicly
 
+With friendly bucket names configured:
+
 ```
-http://localhost:3000/bucket1/path/to/file.pdf
-http://localhost:3000/bucket2/documents/report.xlsx
+# Using friendly names
+http://localhost:3000/documents/path/to/file.pdf
+http://localhost:3000/media/documents/report.xlsx
+
+# Using actual bucket names (also works)
+http://localhost:3000/bucket-23wedf/path/to/file.pdf
+http://localhost:3000/tbdas54/documents/report.xlsx
 ```
 
 No authentication needed - these URLs work for anyone.
 
 ### Upload File via API
 
+You can use either friendly or actual bucket names:
+
 ```bash
-curl -X POST http://localhost:3000/api/buckets/bucket1/upload \
+# Using friendly name
+curl -X POST http://localhost:3000/api/buckets/documents/upload \
+  -H "Authorization: Bearer YOUR_SESSION_TOKEN" \
+  -F "file=@document.pdf" \
+  -F "key=documents/document.pdf"
+
+# Using actual bucket name
+curl -X POST http://localhost:3000/api/buckets/bucket-23wedf/upload \
   -H "Authorization: Bearer YOUR_SESSION_TOKEN" \
   -F "file=@document.pdf" \
   -F "key=documents/document.pdf"

@@ -49,16 +49,22 @@ export function setupApiRoutes(app: Express, authLimiter: any, apiLimiter: any) 
     });
   });
 
-  // List buckets
+  // List buckets (with friendly names)
   app.get('/api/buckets', optionalAuthMiddleware, (req: AuthRequest, res: Response) => {
+    const { config } = require('../config/env');
+    const buckets = config.bucketNames.map((actualName: string) => ({
+      actual: actualName,
+      friendly: s3Service.getFriendlyBucketName(actualName),
+    }));
+
     res.json({
       success: true,
-      buckets: require('../config/env').config.bucketNames,
+      buckets,
       authenticated: !!req.authenticated,
     });
   });
 
-  // List files in a bucket
+  // List files in a bucket (accepts friendly or actual bucket name)
   app.get(
     '/api/buckets/:bucketName/files',
     optionalAuthMiddleware,
@@ -84,6 +90,7 @@ export function setupApiRoutes(app: Express, authLimiter: any, apiLimiter: any) 
         res.json({
           success: true,
           data: result,
+          bucketDisplayName: s3Service.getFriendlyBucketName(s3Service.getActualBucketName(bucketName)),
         });
       } catch (error) {
         next(error);
@@ -141,7 +148,7 @@ export function setupApiRoutes(app: Express, authLimiter: any, apiLimiter: any) 
     }
   );
 
-  // Delete file
+  // Delete file (accepts friendly or actual bucket name)
   app.delete(
     '/api/buckets/:bucketName/files/:fileKey',
     authMiddleware,
@@ -172,7 +179,7 @@ export function setupApiRoutes(app: Express, authLimiter: any, apiLimiter: any) 
     }
   );
 
-  // Move/rename file
+  // Move/rename file (accepts friendly or actual bucket name)
   app.post(
     '/api/buckets/:bucketName/move',
     authMiddleware,
@@ -208,7 +215,7 @@ export function setupApiRoutes(app: Express, authLimiter: any, apiLimiter: any) 
     }
   );
 
-  // Copy file
+  // Copy file (accepts friendly or actual bucket name)
   app.post(
     '/api/buckets/:bucketName/copy',
     authMiddleware,

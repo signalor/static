@@ -11,6 +11,16 @@ This is a production-ready S3-compatible bucket file server with the following c
 - **Rate Limiting**: Distributed rate limiting with Redis support
 - **S3 Service**: Unified interface for S3-compatible buckets
 
+## Technology Stack
+
+- Runtime: Bun (fast JavaScript runtime, Node.js compatible)
+- Language: TypeScript (strict mode)
+- Framework: Express.js
+- S3 Client: AWS SDK v3
+- Rate Limiting: express-rate-limit + Redis
+- File Upload: Multer (memory storage)
+- Frontend: Vanilla JavaScript (no build step needed)
+
 ## Project Structure
 
 ```

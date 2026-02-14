@@ -38,22 +38,56 @@ class S3Service {
   }
 
   /**
-   * Validate that a bucket exists in the configured list
+   * Convert friendly bucket name to actual bucket name
    */
-  validateBucket(bucketName: string): boolean {
-    return config.bucketNames.includes(bucketName);
+  resolveBucketName(bucketNameOrFriendly: string): string | null {
+    // Check if it's an actual bucket name first
+    if (config.bucketNames.includes(bucketNameOrFriendly)) {
+      return bucketNameOrFriendly;
+    }
+
+    // Check if it's a friendly name
+    const actualName = config.bucketNameMap.get(bucketNameOrFriendly);
+    if (actualName) {
+      return actualName;
+    }
+
+    return null;
+  }
+
+  /**
+   * Get friendly name for a bucket (or the actual name if no friendly name exists)
+   */
+  getFriendlyBucketName(actualBucketName: string): string {
+    return config.actualBucketMap.get(actualBucketName) || actualBucketName;
+  }
+
+  /**
+   * Validate that a bucket exists in the configured list (accepts both friendly and actual names)
+   */
+  validateBucket(bucketNameOrFriendly: string): boolean {
+    return this.resolveBucketName(bucketNameOrFriendly) !== null;
+  }
+
+  /**
+   * Get actual bucket name (throws error if invalid)
+   */
+  getActualBucketName(bucketNameOrFriendly: string): string {
+    const actual = this.resolveBucketName(bucketNameOrFriendly);
+    if (!actual) {
+      throw new Error('Invalid bucket');
+    }
+    return actual;
   }
 
   /**
    * Get an object from S3
    */
-  async getObject(bucketName: string, key: string) {
-    if (!this.validateBucket(bucketName)) {
-      throw new Error('Invalid bucket');
-    }
+  async getObject(bucketNameOrFriendly: string, key: string) {
+    const actualBucket = this.getActualBucketName(bucketNameOrFriendly);
 
     const command = new GetObjectCommand({
-      Bucket: bucketName,
+      Bucket: actualBucket,
       Key: key,
     });
 
@@ -64,16 +98,14 @@ class S3Service {
    * List objects in a bucket with optional prefix (folder)
    */
   async listObjects(
-    bucketName: string,
+    bucketNameOrFriendly: string,
     prefix: string = '',
     continuationToken?: string
   ): Promise<FileListResponse> {
-    if (!this.validateBucket(bucketName)) {
-      throw new Error('Invalid bucket');
-    }
+    const actualBucket = this.getActualBucketName(bucketNameOrFriendly);
 
     const command = new ListObjectsV2Command({
-      Bucket: bucketName,
+      Bucket: actualBucket,
       Prefix: prefix,
       MaxKeys: 1000,
       ContinuationToken: continuationToken,
@@ -118,19 +150,17 @@ class S3Service {
    * Upload a file to S3
    */
   async uploadFile(
-    bucketName: string,
+    bucketNameOrFriendly: string,
     key: string,
     body: Buffer | Readable,
     contentType?: string
   ) {
-    if (!this.validateBucket(bucketName)) {
-      throw new Error('Invalid bucket');
-    }
+    const actualBucket = this.getActualBucketName(bucketNameOrFriendly);
 
     const upload = new Upload({
       client: this.client,
       params: {
-        Bucket: bucketName,
+        Bucket: actualBucket,
         Key: key,
         Body: body,
         ContentType: contentType,
@@ -143,13 +173,11 @@ class S3Service {
   /**
    * Delete a file from S3
    */
-  async deleteFile(bucketName: string, key: string) {
-    if (!this.validateBucket(bucketName)) {
-      throw new Error('Invalid bucket');
-    }
+  async deleteFile(bucketNameOrFriendly: string, key: string) {
+    const actualBucket = this.getActualBucketName(bucketNameOrFriendly);
 
     const command = new DeleteObjectCommand({
-      Bucket: bucketName,
+      Bucket: actualBucket,
       Key: key,
     });
 
@@ -159,15 +187,13 @@ class S3Service {
   /**
    * Move a file within the bucket (copy then delete)
    */
-  async moveFile(bucketName: string, sourceKey: string, targetKey: string) {
-    if (!this.validateBucket(bucketName)) {
-      throw new Error('Invalid bucket');
-    }
+  async moveFile(bucketNameOrFriendly: string, sourceKey: string, targetKey: string) {
+    const actualBucket = this.getActualBucketName(bucketNameOrFriendly);
 
     // Copy to new location
     const copyCommand = new CopyObjectCommand({
-      Bucket: bucketName,
-      CopySource: `/${bucketName}/${sourceKey}`,
+      Bucket: actualBucket,
+      CopySource: `/${actualBucket}/${sourceKey}`,
       Key: targetKey,
     });
 
@@ -175,7 +201,7 @@ class S3Service {
 
     // Delete original
     const deleteCommand = new DeleteObjectCommand({
-      Bucket: bucketName,
+      Bucket: actualBucket,
       Key: sourceKey,
     });
 
@@ -185,14 +211,12 @@ class S3Service {
   /**
    * Copy a file within the bucket
    */
-  async copyFile(bucketName: string, sourceKey: string, targetKey: string) {
-    if (!this.validateBucket(bucketName)) {
-      throw new Error('Invalid bucket');
-    }
+  async copyFile(bucketNameOrFriendly: string, sourceKey: string, targetKey: string) {
+    const actualBucket = this.getActualBucketName(bucketNameOrFriendly);
 
     const command = new CopyObjectCommand({
-      Bucket: bucketName,
-      CopySource: `/${bucketName}/${sourceKey}`,
+      Bucket: actualBucket,
+      CopySource: `/${actualBucket}/${sourceKey}`,
       Key: targetKey,
     });
 
@@ -202,8 +226,8 @@ class S3Service {
   /**
    * Get file metadata
    */
-  async getFileMetadata(bucketName: string, key: string) {
-    const response = await this.getObject(bucketName, key);
+  async getFileMetadata(bucketNameOrFriendly: string, key: string) {
+    const response = await this.getObject(bucketNameOrFriendly, key);
     return {
       contentType: response.ContentType,
       contentLength: response.ContentLength,

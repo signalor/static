@@ -6,6 +6,9 @@ interface Config {
   accessKeyId: string;
   secretAccessKey: string;
   bucketNames: string[];
+  friendlyBucketNames?: string[];
+  bucketNameMap: Map<string, string>; // friendly -> actual
+  actualBucketMap: Map<string, string>; // actual -> friendly
   endpoint: string;
   region: string;
   privateToken: string;
@@ -35,10 +38,43 @@ function validateEnv(): Config {
     throw new Error('BUCKET_NAMES must contain at least one bucket');
   }
 
+  const friendlyNames = (process.env.FRIENDLY_BUCKET_NAMES || '')
+    .split(',')
+    .map(b => b.trim())
+    .filter(b => b.length > 0);
+
+  // Validate friendly names match bucket names count
+  if (friendlyNames.length > 0 && friendlyNames.length !== bucketNames.length) {
+    throw new Error(
+      `FRIENDLY_BUCKET_NAMES count (${friendlyNames.length}) must match BUCKET_NAMES count (${bucketNames.length})`
+    );
+  }
+
+  // Create mappings
+  const bucketNameMap = new Map<string, string>();
+  const actualBucketMap = new Map<string, string>();
+
+  if (friendlyNames.length > 0) {
+    bucketNames.forEach((actual, index) => {
+      const friendly = friendlyNames[index];
+      bucketNameMap.set(friendly, actual);
+      actualBucketMap.set(actual, friendly);
+    });
+  } else {
+    // No friendly names, map to themselves
+    bucketNames.forEach(name => {
+      bucketNameMap.set(name, name);
+      actualBucketMap.set(name, name);
+    });
+  }
+
   return {
     accessKeyId: process.env.ACCESS_KEY_ID!,
     secretAccessKey: process.env.SECRET_ACCESS_KEY!,
     bucketNames,
+    friendlyBucketNames: friendlyNames.length > 0 ? friendlyNames : undefined,
+    bucketNameMap,
+    actualBucketMap,
     endpoint: process.env.ENDPOINT!,
     region: process.env.REGION || 'us-east-1',
     privateToken: process.env.PRIVATE_TOKEN!,
