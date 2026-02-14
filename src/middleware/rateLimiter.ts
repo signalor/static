@@ -39,7 +39,9 @@ export async function setupRateLimiters() {
 
     if (redis) {
       options.store = new RedisStore({
-        client: redis,
+        sendCommand: async (command: string[]) => {
+          return redis.sendCommand(command);
+        },
         prefix: 'rl:',
       });
     }
