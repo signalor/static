@@ -486,7 +486,7 @@
 
         <div id="fileGrid" class="file-grid">
           <div class="empty-state">
-            <div class="empty-state-icon">📂</div>
+            <div class="empty-state-icon">[FOLDER]</div>
             <p>Select a bucket to view files</p>
           </div>
         </div>
@@ -684,7 +684,7 @@
         if (state.files.length === 0) {
           fileGrid.innerHTML = `
             <div class="empty-state">
-              <div class="empty-state-icon">📂</div>
+              <div class="empty-state-icon">[FOLDER]</div>
               <p>No files in this folder</p>
             </div>
           `;
@@ -811,32 +811,32 @@
       function getFileIcon(fileName) {
         const ext = fileName.split('.').pop().toLowerCase();
         const icons = {
-          pdf: '📄',
-          doc: '📝',
-          docx: '📝',
-          xls: '📊',
-          xlsx: '📊',
-          ppt: '🎯',
-          pptx: '🎯',
-          jpg: '🖼',
-          jpeg: '🖼',
-          png: '🖼',
-          gif: '🖼',
-          svg: '🖼',
-          zip: '📦',
-          rar: '📦',
-          mp4: '🎬',
-          mp3: '🎵',
-          txt: '📋',
-          csv: '📊',
-          json: '{}',
-          js: '{}',
-          ts: '{}',
-          html: '🌐',
-          css: '🎨',
-          xml: '📌',
+          pdf: '[PDF]',
+          doc: '[DOC]',
+          docx: '[DOC]',
+          xls: '[XLS]',
+          xlsx: '[XLS]',
+          ppt: '[PPT]',
+          pptx: '[PPT]',
+          jpg: '[IMG]',
+          jpeg: '[IMG]',
+          png: '[IMG]',
+          gif: '[IMG]',
+          svg: '[IMG]',
+          zip: '[ZIP]',
+          rar: '[ZIP]',
+          mp4: '[VID]',
+          mp3: '[AUD]',
+          txt: '[TXT]',
+          csv: '[CSV]',
+          json: '[JSON]',
+          js: '[JS]',
+          ts: '[TS]',
+          html: '[HTML]',
+          css: '[CSS]',
+          xml: '[XML]',
         };
-        return icons[ext] || '📄';
+        return icons[ext] || '[FILE]';
       }
 
       // Bucket selection

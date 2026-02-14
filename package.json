@@ -2,12 +2,11 @@
   "name": "signalor-static-server",
   "version": "1.0.0",
   "description": "S3-compatible bucket file server with GUI and proxy",
-  "main": "dist/server.js",
+  "main": "server.js",
   "type": "module",
   "scripts": {
     "dev": "bun run src/server.ts",
-    "build": "bun run --bun tsc",
-    "start": "bun dist/server.js",
+    "start": "bun run src/server.js",
     "type-check": "bun run --bun tsc --noEmit"
   },
   "keywords": [
