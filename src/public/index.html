@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signalor Static File Manager</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+          Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+
+      .app {
+        width: 100%;
+        max-width: 1200px;
+      }
+
+      .login-container,
+      .manager-container {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+      }
+
+      .login-form {
+        max-width: 400px;
+        margin: 0 auto;
+      }
+
+      .login-form h1 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        color: #333;
+        text-align: center;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #555;
+      }
+
+      input[type='password'],
+      input[type='text'],
+      select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 4px;
+        font-size: 1rem;
+        transition: border-color 0.2s;
+      }
+
+      input[type='password']:focus,
+      input[type='text']:focus,
+      select:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      button {
+        width: 100%;
+        padding: 0.75rem;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      button:hover {
+        background-color: #5568d3;
+      }
+
+      button:active {
+        transform: scale(0.98);
+      }
+
+      .error {
+        background: #fee;
+        color: #c33;
+        padding: 0.75rem;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+        border-left: 4px solid #c33;
+      }
+
+      .success {
+        background: #efe;
+        color: #3c3;
+        padding: 0.75rem;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+        border-left: 4px solid #3c3;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      /* Manager styles */
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f0f0f0;
+      }
+
+      .header h1 {
+        font-size: 1.5rem;
+        color: #333;
+      }
+
+      .logout-btn {
+        width: auto;
+        padding: 0.5rem 1rem;
+        background: #999;
+        font-size: 0.9rem;
+      }
+
+      .logout-btn:hover {
+        background-color: #777;
+      }
+
+      .controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      @media (max-width: 768px) {
+        .controls {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .breadcrumb {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        color: #666;
+        flex-wrap: wrap;
+      }
+
+      .breadcrumb button {
+        width: auto;
+        padding: 0.25rem 0.75rem;
+        background: #f0f0f0;
+        color: #667eea;
+        font-size: 0.85rem;
+      }
+
+      .breadcrumb button:hover {
+        background: #e0e0e0;
+      }
+
+      .breadcrumb span {
+        color: #999;
+      }
+
+      .file-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+      }
+
+      .file-card {
+        background: #fafafa;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .file-card:hover {
+        border-color: #667eea;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .file-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .file-name {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+        word-break: break-word;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .file-meta {
+        font-size: 0.8rem;
+        color: #999;
+        margin-bottom: 0.75rem;
+      }
+
+      .file-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .file-actions button {
+        flex: 1;
+        padding: 0.5rem;
+        font-size: 0.8rem;
+        background: #e0e0e0;
+        color: #333;
+      }
+
+      .file-actions button:hover {
+        background: #d0d0d0;
+      }
+
+      .file-actions button.delete {
+        background: #ffdbdb;
+        color: #c33;
+      }
+
+      .file-actions button.delete:hover {
+        background: #ffcccc;
+      }
+
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 8px;
+        padding: 2rem;
+        max-width: 500px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .modal-header {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: #333;
+      }
+
+      .modal-footer {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+      }
+
+      .modal-footer button {
+        flex: 1;
+      }
+
+      .modal-footer button.cancel {
+        background: #e0e0e0;
+        color: #333;
+      }
+
+      .modal-footer button.cancel:hover {
+        background: #d0d0d0;
+      }
+
+      .upload-area {
+        border: 2px dashed #667eea;
+        border-radius: 8px;
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: #f9f9f9;
+      }
+
+      .upload-area:hover,
+      .upload-area.drag-over {
+        background: #f0f0ff;
+        border-color: #5568d3;
+      }
+
+      .upload-area p {
+        color: #666;
+        margin-bottom: 0.5rem;
+      }
+
+      .upload-area small {
+        color: #999;
+      }
+
+      .loading {
+        opacity: 0.6;
+        pointer-events: none;
+      }
+
+      .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 0.5rem;
+        vertical-align: middle;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #999;
+      }
+
+      .empty-state-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+
+      .stats {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: #f9f9f9;
+        border-radius: 8px;
+      }
+
+      .stat {
+        flex: 1;
+      }
+
+      .stat-label {
+        font-size: 0.85rem;
+        color: #999;
+        text-transform: uppercase;
+        margin-bottom: 0.25rem;
+      }
+
+      .stat-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #667eea;
+      }
+
+      input[type='file'] {
+        display: none;
+      }
+
+      .bucket-selector {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .bucket-selector select {
+        flex: 1;
+      }
+
+      .bucket-selector button {
+        width: auto;
+        padding: 0.75rem 1.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <!-- Login Section -->
+      <div id="loginSection" class="login-container">
+        <form id="loginForm" class="login-form">
+          <h1>🔐 File Manager</h1>
+
+          <div id="loginError" class="error hidden"></div>
+          <div id="loginSuccess" class="success hidden"></div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Enter access password"
+              required
+            />
+          </div>
+
+          <button type="submit">Login</button>
+
+          <p style="text-align: center; margin-top: 1rem; color: #999; font-size: 0.85rem">
+            Enter the access password to manage files
+          </p>
+        </form>
+      </div>
+
+      <!-- Manager Section -->
+      <div id="managerSection" class="manager-container hidden">
+        <div class="header">
+          <h1>📁 File Manager</h1>
+          <button id="logoutBtn" class="logout-btn">Logout</button>
+        </div>
+
+        <div id="managerError" class="error hidden"></div>
+        <div id="managerSuccess" class="success hidden"></div>
+
+        <div class="bucket-selector">
+          <select id="bucketSelect">
+            <option value="">Select a bucket...</option>
+          </select>
+          <button id="refreshBtn">Refresh</button>
+        </div>
+
+        <div id="stats" class="stats hidden">
+          <div class="stat">
+            <div class="stat-label">Files</div>
+            <div class="stat-value" id="fileCount">0</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Total Size</div>
+            <div class="stat-value" id="totalSize">0 B</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Current Path</div>
+            <div class="stat-value" id="currentPath" style="font-size: 1rem; word-break: break-all">
+              /
+            </div>
+          </div>
+        </div>
+
+        <div class="breadcrumb" id="breadcrumb"></div>
+
+        <div class="controls">
+          <button id="uploadBtn">📤 Upload File</button>
+          <button id="newFolderBtn">📁 New Folder</button>
+          <input
+            type="file"
+            id="fileInput"
+            accept="*"
+          />
+        </div>
+
+        <div id="fileGrid" class="file-grid">
+          <div class="empty-state">
+            <div class="empty-state-icon">📂</div>
+            <p>Select a bucket to view files</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="uploadModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">Upload File</div>
+
+        <div class="upload-area" id="uploadArea">
+          <p>📥 Drop file here or click to select</p>
+          <small>Drag and drop a file to upload</small>
+        </div>
+
+        <div id="uploadProgress" class="hidden" style="margin-top: 1rem">
+          <div class="spinner"></div>
+          <span>Uploading...</span>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="cancel" id="uploadCancel">Cancel</button>
+          <button type="button" id="uploadConfirm" disabled>Upload</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- New Folder Modal -->
+    <div id="folderModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">New Folder</div>
+
+        <div class="form-group">
+          <label for="folderName">Folder Name</label>
+          <input
+            type="text"
+            id="folderName"
+            placeholder="Enter folder name"
+          />
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="cancel" id="folderCancel">Cancel</button>
+          <button type="button" id="folderConfirm">Create</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rename Modal -->
+    <div id="renameModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">Rename File</div>
+
+        <div class="form-group">
+          <label for="newName">New Name</label>
+          <input
+            type="text"
+            id="newName"
+            placeholder="Enter new name"
+          />
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="cancel" id="renameCancel">Cancel</button>
+          <button type="button" id="renameConfirm">Rename</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // State
+      const state = {
+        authenticated: false,
+        currentBucket: null,
+        currentPath: '',
+        files: [],
+        selectedFile: null,
+      };
+
+      // DOM Elements
+      const loginSection = document.getElementById('loginSection');
+      const managerSection = document.getElementById('managerSection');
+      const loginForm = document.getElementById('loginForm');
+      const bucketSelect = document.getElementById('bucketSelect');
+      const refreshBtn = document.getElementById('refreshBtn');
+      const uploadBtn = document.getElementById('uploadBtn');
+      const newFolderBtn = document.getElementById('newFolderBtn');
+      const fileGrid = document.getElementById('fileGrid');
+      const breadcrumb = document.getElementById('breadcrumb');
+      const fileInput = document.getElementById('fileInput');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const stats = document.getElementById('stats');
+
+      // Modals
+      const uploadModal = document.getElementById('uploadModal');
+      const folderModal = document.getElementById('folderModal');
+      const renameModal = document.getElementById('renameModal');
+
+      // Message display
+      const showError = (message, section = 'manager') => {
+        const elem = document.getElementById(`${section}Error`);
+        elem.textContent = message;
+        elem.classList.remove('hidden');
+        setTimeout(() => elem.classList.add('hidden'), 5000);
+      };
+
+      const showSuccess = (message, section = 'manager') => {
+        const elem = document.getElementById(`${section}Success`);
+        elem.textContent = message;
+        elem.classList.remove('hidden');
+        setTimeout(() => elem.classList.add('hidden'), 5000);
+      };
+
+      // Login
+      loginForm.addEventListener('submit', async e => {
+        e.preventDefault();
+        const password = document.getElementById('password').value;
+
+        try {
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password }),
+          });
+
+          if (!res.ok) throw new Error('Invalid password');
+
+          state.authenticated = true;
+          showSuccess('Login successful!', 'login');
+          loginSection.classList.add('hidden');
+          managerSection.classList.remove('hidden');
+
+          // Load buckets
+          await loadBuckets();
+        } catch (error) {
+          showError(error.message, 'login');
+        }
+      });
+
+      // Logout
+      logoutBtn.addEventListener('click', () => {
+        state.authenticated = false;
+        state.currentBucket = null;
+        state.currentPath = '';
+        loginSection.classList.remove('hidden');
+        managerSection.classList.add('hidden');
+        document.getElementById('password').value = '';
+      });
+
+      // Load buckets
+      async function loadBuckets() {
+        try {
+          const res = await fetch('/api/buckets');
+          const data = await res.json();
+
+          bucketSelect.innerHTML = '<option value="">Select a bucket...</option>';
+          data.buckets.forEach(bucket => {
+            const option = document.createElement('option');
+            option.value = bucket;
+            option.textContent = bucket;
+            bucketSelect.appendChild(option);
+          });
+        } catch (error) {
+          showError('Failed to load buckets');
+        }
+      }
+
+      // Load files
+      async function loadFiles() {
+        if (!state.currentBucket) return;
+
+        try {
+          const prefix = state.currentPath ? state.currentPath + '/' : '';
+          const res = await fetch(
+            `/api/buckets/${state.currentBucket}/files?prefix=${encodeURIComponent(prefix)}`
+          );
+          const data = await res.json();
+
+          state.files = data.data.files || [];
+          renderFiles();
+          updateStats();
+        } catch (error) {
+          showError('Failed to load files');
+        }
+      }
+
+      // Render files
+      function renderFiles() {
+        fileGrid.innerHTML = '';
+
+        if (state.files.length === 0) {
+          fileGrid.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">📂</div>
+              <p>No files in this folder</p>
+            </div>
+          `;
+          return;
+        }
+
+        state.files.forEach(file => {
+          const isFolder = file.eTag === 'folder';
+          const fileName = file.key.split('/').filter(Boolean).pop();
+          const card = document.createElement('div');
+          card.className = 'file-card';
+
+          const icon = isFolder ? '📁' : getFileIcon(fileName);
+          const size = isFolder ? '-' : formatBytes(file.size);
+
+          card.innerHTML = `
+            <div class="file-icon">${icon}</div>
+            <div class="file-name" title="${fileName}">${fileName}</div>
+            <div class="file-meta">${size}</div>
+            <div class="file-actions">
+              ${isFolder ? `<button class="open">Open</button>` : `<button class="download">Download</button>`}
+              <button class="rename">Rename</button>
+              <button class="delete">Delete</button>
+            </div>
+          `;
+
+          if (isFolder) {
+            card.querySelector('.open').addEventListener('click', () => {
+              state.currentPath = file.key.replace(/\/$/, '');
+              updateBreadcrumb();
+              loadFiles();
+            });
+          } else {
+            card.querySelector('.download').addEventListener('click', () => {
+              const url = `/${state.currentBucket}/${file.key}`;
+              window.open(url, '_blank');
+            });
+          }
+
+          card.querySelector('.rename').addEventListener('click', () => {
+            state.selectedFile = file;
+            document.getElementById('newName').value = fileName;
+            renameModal.classList.remove('hidden');
+          });
+
+          card.querySelector('.delete').addEventListener('click', () => {
+            if (confirm(`Delete ${fileName}?`)) {
+              deleteFile(file.key);
+            }
+          });
+
+          fileGrid.appendChild(card);
+        });
+      }
+
+      // Update stats
+      function updateStats() {
+        document.getElementById('fileCount').textContent = state.files.length;
+        const total = state.files.reduce((sum, f) => sum + f.size, 0);
+        document.getElementById('totalSize').textContent = formatBytes(total);
+        document.getElementById('currentPath').textContent = state.currentPath || '/';
+        stats.classList.remove('hidden');
+      }
+
+      // Update breadcrumb
+      function updateBreadcrumb() {
+        const parts = state.currentPath.split('/').filter(Boolean);
+        breadcrumb.innerHTML = '<button class="home">Home</button>';
+
+        breadcrumb.querySelector('.home').addEventListener('click', () => {
+          state.currentPath = '';
+          updateBreadcrumb();
+          loadFiles();
+        });
+
+        let currentPath = '';
+        parts.forEach((part, index) => {
+          currentPath += '/' + part;
+          const span = document.createElement('span');
+          span.textContent = '/';
+          breadcrumb.appendChild(span);
+
+          const button = document.createElement('button');
+          button.textContent = part;
+          button.type = 'button';
+          const path = currentPath.substring(1);
+
+          button.addEventListener('click', () => {
+            state.currentPath = path;
+            updateBreadcrumb();
+            loadFiles();
+          });
+
+          breadcrumb.appendChild(button);
+        });
+      }
+
+      // Delete file
+      async function deleteFile(key) {
+        try {
+          const res = await fetch(`/api/buckets/${state.currentBucket}/files/${encodeURIComponent(key)}`, {
+            method: 'DELETE',
+          });
+
+          if (!res.ok) throw new Error('Failed to delete');
+
+          showSuccess('File deleted');
+          loadFiles();
+        } catch (error) {
+          showError(error.message);
+        }
+      }
+
+      // Format bytes
+      function formatBytes(bytes) {
+        if (bytes === 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+      }
+
+      // Get file icon
+      function getFileIcon(fileName) {
+        const ext = fileName.split('.').pop().toLowerCase();
+        const icons = {
+          pdf: '📄',
+          doc: '📝',
+          docx: '📝',
+          xls: '📊',
+          xlsx: '📊',
+          ppt: '🎯',
+          pptx: '🎯',
+          jpg: '🖼',
+          jpeg: '🖼',
+          png: '🖼',
+          gif: '🖼',
+          svg: '🖼',
+          zip: '📦',
+          rar: '📦',
+          mp4: '🎬',
+          mp3: '🎵',
+          txt: '📋',
+          csv: '📊',
+          json: '{}',
+          js: '{}',
+          ts: '{}',
+          html: '🌐',
+          css: '🎨',
+          xml: '📌',
+        };
+        return icons[ext] || '📄';
+      }
+
+      // Bucket selection
+      bucketSelect.addEventListener('change', () => {
+        state.currentBucket = bucketSelect.value;
+        state.currentPath = '';
+        updateBreadcrumb();
+        if (state.currentBucket) {
+          loadFiles();
+        }
+      });
+
+      refreshBtn.addEventListener('click', loadFiles);
+
+      // Upload
+      uploadBtn.addEventListener('click', () => {
+        uploadModal.classList.remove('hidden');
+      });
+
+      document.getElementById('uploadCancel').addEventListener('click', () => {
+        uploadModal.classList.add('hidden');
+        fileInput.value = '';
+      });
+
+      const uploadArea = document.getElementById('uploadArea');
+      uploadArea.addEventListener('click', () => fileInput.click());
+
+      uploadArea.addEventListener('dragover', e => {
+        e.preventDefault();
+        uploadArea.classList.add('drag-over');
+      });
+
+      uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('drag-over');
+      });
+
+      uploadArea.addEventListener('drop', e => {
+        e.preventDefault();
+        uploadArea.classList.remove('drag-over');
+        if (e.dataTransfer.files.length) {
+          fileInput.files = e.dataTransfer.files;
+          document.getElementById('uploadConfirm').disabled = false;
+        }
+      });
+
+      fileInput.addEventListener('change', () => {
+        document.getElementById('uploadConfirm').disabled = fileInput.files.length === 0;
+      });
+
+      document.getElementById('uploadConfirm').addEventListener('click', async () => {
+        if (!fileInput.files.length) return;
+
+        const file = fileInput.files[0];
+        const fileName = file.name;
+        const key = state.currentPath ? `${state.currentPath}/${fileName}` : fileName;
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('key', key);
+
+        try {
+          document.getElementById('uploadProgress').classList.remove('hidden');
+
+          const res = await fetch(`/api/buckets/${state.currentBucket}/upload`, {
+            method: 'POST',
+            body: formData,
+          });
+
+          if (!res.ok) throw new Error('Upload failed');
+
+          showSuccess('File uploaded successfully');
+          uploadModal.classList.add('hidden');
+          fileInput.value = '';
+          loadFiles();
+        } catch (error) {
+          showError(error.message);
+        } finally {
+          document.getElementById('uploadProgress').classList.add('hidden');
+        }
+      });
+
+      // New folder
+      newFolderBtn.addEventListener('click', () => {
+        folderModal.classList.remove('hidden');
+      });
+
+      document.getElementById('folderCancel').addEventListener('click', () => {
+        folderModal.classList.add('hidden');
+        document.getElementById('folderName').value = '';
+      });
+
+      document.getElementById('folderConfirm').addEventListener('click', async () => {
+        const folderName = document.getElementById('folderName').value.trim();
+        if (!folderName) {
+          showError('Please enter a folder name');
+          return;
+        }
+
+        const key = state.currentPath ? `${state.currentPath}/${folderName}/` : `${folderName}/`;
+
+        try {
+          const formData = new FormData();
+          formData.append('file', new Blob([]), 'application/octet-stream');
+          formData.append('key', key);
+
+          const res = await fetch(`/api/buckets/${state.currentBucket}/upload`, {
+            method: 'POST',
+            body: formData,
+          });
+
+          if (!res.ok) throw new Error('Failed to create folder');
+
+          showSuccess('Folder created');
+          folderModal.classList.add('hidden');
+          document.getElementById('folderName').value = '';
+          loadFiles();
+        } catch (error) {
+          showError(error.message);
+        }
+      });
+
+      // Rename
+      document.getElementById('renameCancel').addEventListener('click', () => {
+        renameModal.classList.add('hidden');
+        state.selectedFile = null;
+      });
+
+      document.getElementById('renameConfirm').addEventListener('click', async () => {
+        if (!state.selectedFile) return;
+
+        const newName = document.getElementById('newName').value.trim();
+        if (!newName) {
+          showError('Please enter a new name');
+          return;
+        }
+
+        const oldKey = state.selectedFile.key;
+        const pathParts = oldKey.split('/');
+        pathParts[pathParts.length - 1] = newName;
+        const newKey = pathParts.join('/');
+
+        try {
+          const res = await fetch(`/api/buckets/${state.currentBucket}/move`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sourceKey: oldKey, targetKey: newKey }),
+          });
+
+          if (!res.ok) throw new Error('Failed to rename');
+
+          showSuccess('File renamed');
+          renameModal.classList.add('hidden');
+          state.selectedFile = null;
+          loadFiles();
+        } catch (error) {
+          showError(error.message);
+        }
+      });
+    </script>
+  </body>
+</html>
