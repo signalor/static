@@ -1,3 +1,5 @@
+import { createHash, timingSafeEqual } from 'node:crypto';
+
 import type { Request, Response, NextFunction } from 'express';
 import { config } from '../config/env';
 
@@ -45,7 +47,10 @@ export function validateToken(token: string): boolean {
 }
 
 export function verifyPassword(password: string): boolean {
-  return password === config.privateToken;
+  const providedDigest = createHash('sha256').update(password, 'utf8').digest();
+  const expectedDigest = createHash('sha256').update(config.privateToken, 'utf8').digest();
+
+  return timingSafeEqual(providedDigest, expectedDigest);
 }
 
 export function authMiddleware(

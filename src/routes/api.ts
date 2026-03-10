@@ -5,7 +5,6 @@ import {
   authMiddleware,
   verifyPassword,
   createSession,
-  optionalAuthMiddleware,
 } from '../middleware/auth';
 import type { Readable } from 'stream';
 
@@ -45,12 +44,11 @@ export function setupApiRoutes(app: Express, authLimiter: any, apiLimiter: any) 
 
     res.json({
       success: true,
-      sessionToken,
     });
   });
 
   // List buckets (with friendly names)
-  app.get('/api/buckets', optionalAuthMiddleware, (req: AuthRequest, res: Response) => {
+  app.get('/api/buckets', authMiddleware, (req: AuthRequest, res: Response) => {
     const { config } = require('../config/env');
     const buckets = config.bucketNames.map((actualName: string) => ({
       actual: actualName,
@@ -60,14 +58,13 @@ export function setupApiRoutes(app: Express, authLimiter: any, apiLimiter: any) 
     res.json({
       success: true,
       buckets,
-      authenticated: !!req.authenticated,
     });
   });
 
   // List files in a bucket (accepts friendly or actual bucket name)
   app.get(
     '/api/buckets/:bucketName/files',
-    optionalAuthMiddleware,
+    authMiddleware,
     apiLimiter,
     async (req: AuthRequest, res: Response, next: NextFunction) => {
       try {
